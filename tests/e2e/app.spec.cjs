@@ -88,3 +88,41 @@ test('restores family records from a JSON backup file', async ({ page }) => {
   await expect(page.locator('#famList')).toContainText('عائلة مستعادة');
   await expect(page.locator('#famList')).not.toContainText('عائلة الاستعادة');
 });
+
+
+test('handles an 81 kg quota in bag and remainder stages without losing payment balance', async ({ page }) => {
+  await page.locator('#aName').fill('عائلة 81 كغم');
+  await page.locator('#aMembers').fill('9');
+  await page.getByRole('button', { name: 'إضافة عائلة' }).click();
+  await page.locator('#nav button[data-p="dist"]').click();
+  await page.locator('#distSearch').fill('عائلة 81 كغم');
+  let card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 81 كغم' });
+  await expect(card).toContainText('81 كغم');
+  await expect(card).toContainText('1 كيس و 31 كغم');
+  await card.locator('input[id^="b_"]').check();
+  await card.getByRole('button', { name: 'تسليم وتسجيل الاستلام' }).click();
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 81 كغم' });
+  await expect(card).toContainText('مستلم جزئي');
+  await expect(card).toContainText('50 كغم');
+  await card.locator('input[id^="k_"]').check();
+  await card.getByRole('button', { name: 'تسليم وتسجيل الاستلام' }).click();
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 81 كغم' });
+  await expect(card).toContainText('مستلم بالكامل');
+  await expect(card).toContainText('81 كغم');
+  await expect(card).toContainText('2,250 د.ع');
+});
+
+test('handles an exact 50 kg quota as one bag with no remainder checkbox', async ({ page }) => {
+  await page.locator('#aName').fill('عائلة 50 كغم');
+  await page.locator('#aMembers').fill('6');
+  await page.getByRole('button', { name: 'إضافة عائلة' }).click();
+  await page.locator('#nav button[data-p="dist"]').click();
+  await page.locator('#distSearch').fill('عائلة 50 كغم');
+  const card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 50 كغم' });
+  await expect(card).toContainText('50 كغم');
+  await expect(card.locator('input[id^="b_"]')).toBeEnabled();
+  await expect(card.locator('input[id^="k_"]')).toBeDisabled();
+  await card.locator('input[id^="b_"]').check();
+  await card.getByRole('button', { name: 'تسليم وتسجيل الاستلام' }).click();
+  await expect(page.locator('#distList .card.sub').filter({ hasText: 'عائلة 50 كغم' })).toContainText('مستلم بالكامل');
+});
