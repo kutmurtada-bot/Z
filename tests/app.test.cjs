@@ -67,3 +67,7 @@ test('Google Sheets sync does not claim verified success for an opaque no-cors r
 test('editing family member count recalculates the fixed quota and payment', () => {
   assert.match(html, /f\.members=m;f\.share=m\*KG_PER_PERSON;f\.amount=m\*IQD_PER_PERSON/);
 });
+
+test('native Android is tagged as production in Sentry', () => {
+  assert.match(html, /window\.Capacitor&&window\.Capacitor\.isNativePlatform&&window\.Capacitor\.isNativePlatform\(\)/);
+});
