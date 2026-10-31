@@ -328,7 +328,7 @@ const TITLES={home:'الصفحة الرئيسية',fam:'العوائل',dist:'ص
 
 let DB=loadDB(),S=loadS();
 function fresh(){return{families:[],records:{},meta:{}}}
-function loadDB(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&Array.isArray(d.families))return{families:d.families,records:d.records||{},meta:d.meta||{}}}catch(e){}return fresh()}
+function loadDB(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&Array.isArray(d.families)){const records=d.records||{};Object.keys(records).forEach(k=>Object.keys(records[k]||{}).forEach(id=>{const r=records[k][id],f=d.families.find(x=>x.id===id);if(f&&r&&(r.bags||r.kg||r.kgReceived>0)){if(r.quotaKg==null)r.quotaKg=f.share;if(r.amountDue==null)r.amountDue=f.amount;if(r.membersCount==null)r.membersCount=f.members}}));return{families:d.families,records,meta:d.meta||{}}}}catch(e){}return fresh()}
 function loadS(){try{const s=JSON.parse(localStorage.getItem(SKEY));if(s)return Object.assign({sheetUrl:DEFAULT_SHEET,tgToken:'',tgChat:''},s)}catch(e){}return{sheetUrl:DEFAULT_SHEET,tgToken:'',tgChat:''}}
 function save(){localStorage.setItem(KEY,JSON.stringify(DB))}
 function saveS(){localStorage.setItem(SKEY,JSON.stringify(S))}
@@ -467,10 +467,13 @@ function fillSelects(){
 }
 const keyOf=p=>`${$('#'+p+'Year').value}-${$('#'+p+'Month').value}`;
 const monthLabel=p=>`${MONTHS[$('#'+p+'Month').value-1]} ${$('#'+p+'Year').value}`;
-const recR=(k,id)=>(DB.records[k]&&DB.records[k][id])||{bags:false,kg:false,kgReceived:0,amtReceived:0};
+const recR=(k,id)=>(DB.records[k]&&DB.records[k][id])||{bags:false,kg:false,kgReceived:0,amtReceived:0,quotaKg:null,amountDue:null,membersCount:null};
+const quotaOf=(f,k)=>recR(k,f.id).quotaKg??f.share;
+const amountOf=(f,k)=>recR(k,f.id).amountDue??f.amount;
+const membersOf=(f,k)=>recR(k,f.id).membersCount??f.members;
 function recW(k,id){DB.records[k]=DB.records[k]||{};return DB.records[k][id]=DB.records[k][id]||{bags:false,kg:false,kgReceived:0,amtReceived:0}}
 function statusOf(f,k){
-  const r=recR(k,f.id),b=Math.floor(f.share/BAG),rem=f.share%BAG;
+  const r=recR(k,f.id),share=quotaOf(f,k),b=Math.floor(share/BAG),rem=share%BAG;
   if(!r.bags&&!r.kg)return'none';
   return((b===0||r.bags)&&(rem===0||r.kg))?'full':'partial';
 }
@@ -486,19 +489,19 @@ function showDistInfo(){
   $('#dInfo').textContent=m&&m.date?`الوقت والتاريخ (محفوظ تلقائياً): ${fmtDT(m.date)}`:`الوقت والتاريخ: ${fmtDT(Date.now())} (يُحفظ تلقائياً عند أول تسجيل)`;
 }
 function memberCard(f,k){
-  const r=recR(k,f.id),b=Math.floor(f.share/BAG),rem=f.share%BAG,st=statusOf(f,k),[stT,stC]=ST[st];
+  const r=recR(k,f.id),share=quotaOf(f,k),due=amountOf(f,k),members=membersOf(f,k),b=Math.floor(share/BAG),rem=share%BAG,st=statusOf(f,k),[stT,stC]=ST[st];
   return `<div class="card sub"><div class="name">${esc(f.name)}</div>
   <div class="kv"><span>رقم الصفحة</span><b>${esc(f.page)||'—'}</b></div>
   ${f.notes?`<div class="kv"><span>الملاحظات</span><b>${esc(f.notes)}</b></div>`:''}
-  <div class="kv"><span>عدد أفراد الأسرة</span><b>${f.members}</b></div>
-  <div class="kv"><span>الحصة الشهرية</span><b>${f.share} كغم = ${detail(f.share)}</b></div>
-  <div class="kv"><span>المبلغ المستحق</span><b>${fmt(f.amount)} د.ع</b></div>
+  <div class="kv"><span>عدد أفراد الأسرة</span><b>${members}</b></div>
+  <div class="kv"><span>الحصة الشهرية</span><b>${share} كغم = ${detail(share)}</b></div>
+  <div class="kv"><span>المبلغ المستحق</span><b>${fmt(due)} د.ع</b></div>
   <div class="kv"><span>الحالة</span><b><span class="badge ${stC}">${stT}</span></b></div>
   <label class="chk"><input type="checkbox" id="b_${f.id}" ${r.bags?'checked disabled':''} ${b===0?'disabled':''}><span>استلام الأكياس (${b} كيس)</span></label>
   <label class="chk"><input type="checkbox" id="k_${f.id}" ${r.kg?'checked disabled':''} ${rem===0?'disabled':''}><span>استلام الكيلوات فوق الكيس (${rem} كغم)</span></label>
   <div class="kv"><span>المبلغ المستلم فعلياً</span><b>${fmt(r.amtReceived)} د.ع</b></div>
   <div class="kv"><span>الكمية المستلمة</span><b>${r.kgReceived} كغم</b></div>
-  <div class="kv"><span>الكمية المتبقية عند الموزع</span><b>${Math.max(0,f.share-r.kgReceived)} كغم</b></div>
+  <div class="kv"><span>الكمية المتبقية عند الموزع</span><b>${Math.max(0,share-r.kgReceived)} كغم</b></div>
   ${st!=='full'?`<button class="full" onclick="deliverOne('${f.id}')">تسليم وتسجيل الاستلام</button>`:'<div class="ok" style="text-align:center;margin-top:10px">✓ تم استلام الحصة بالكامل</div>'}
   </div>`;
 }
@@ -514,7 +517,7 @@ function renderDist(){
   $('#distList').innerHTML=roots.map(f=>{
     const kids=f.children.map(fam).filter(Boolean);
     if(!kids.length)return memberCard(f,k);
-    const all=[f,...kids],tm=all.reduce((a,x)=>a+x.members,0),ts=all.reduce((a,x)=>a+x.share,0),ta=all.reduce((a,x)=>a+x.amount,0),
+    const all=[f,...kids],tm=all.reduce((a,x)=>a+membersOf(x,k),0),ts=all.reduce((a,x)=>a+quotaOf(x,k),0),ta=all.reduce((a,x)=>a+amountOf(x,k),0),
     tr=all.reduce((a,x)=>a+recR(k,x.id).kgReceived,0),tam=all.reduce((a,x)=>a+recR(k,x.id).amtReceived,0);
     return `<div class="group"><div class="name">مجموع العوائل المرتبطة</div>
     <div class="kv"><span>عدد الأسر</span><b>${all.length}</b></div>
@@ -534,14 +537,16 @@ function renderDist(){
 function groupIds(id){const f=fam(id);return[f.id,...f.children.filter(fam)]}
 function tickAll(id){groupIds(id).forEach(i=>['b_','k_'].forEach(p=>{const e=$('#'+p+i);if(e&&!e.disabled)e.checked=true}))}
 function applyDelivery(f,k){
-  const b=Math.floor(f.share/BAG),rem=f.share%BAG,r=recW(k,f.id);
+  const r=recW(k,f.id);
+  if(r.quotaKg==null){r.quotaKg=f.share;r.amountDue=f.amount;r.membersCount=f.members;}
+  const share=r.quotaKg,due=r.amountDue,b=Math.floor(share/BAG),rem=share%BAG;
   const selB=!!($('#b_'+f.id)||{}).checked,selK=!!($('#k_'+f.id)||{}).checked;
   const addB=b>0&&selB&&!r.bags,addK=rem>0&&selK&&!r.kg;
   if(!addB&&!addK)return null;
   const kg=(addB?b*BAG:0)+(addK?rem:0);
   if(addB)r.bags=true;if(addK)r.kg=true;
   const done=(b===0||r.bags)&&(rem===0||r.kg);
-  const amt=done?Math.max(0,f.amount-r.amtReceived):Math.round(f.amount*kg/f.share);
+  const amt=done?Math.max(0,due-r.amtReceived):Math.round(due*kg/share);
   r.kgReceived+=kg;r.amtReceived+=amt;
   (r.log=r.log||[]).push({t:Date.now(),kg,amt});
   return{f,kg,amt};
@@ -551,7 +556,7 @@ function finishDelivery(items){
   const k=keyOf('d');const m=DB.meta[k]=DB.meta[k]||{};
   if(!m.date)m.date=Date.now();if(!m.name)m.name=$('#dName').value;
   save();renderDist();toast('تم تسجيل الاستلام ✓');
-  const name=items.map(i=>i.f.name).join(' + '),mem=items.reduce((a,i)=>a+i.f.members,0),kg=items.reduce((a,i)=>a+i.kg,0),amt=items.reduce((a,i)=>a+i.amt,0);
+  const name=items.map(i=>i.f.name).join(' + '),mem=items.reduce((a,i)=>a+membersOf(i.f,k),0),kg=items.reduce((a,i)=>a+i.kg,0),amt=items.reduce((a,i)=>a+i.amt,0);
   sendTelegram(`📦 تم تسجيل تسليم حصة طحين\n\n👤 اسم رب الأسرة: ${name}\n👨‍👩‍👧‍👦 عدد أفراد الأسرة: ${mem} فرد\n🌾 حصة الطحين المستلمة: ${kg} كغم\n💰 المبلغ المستحصل: ${fmt(amt)} د.ع\n📅 الشهر والسنة: ${monthLabel('d')}\n🕒 تاريخ ووقت التسليم: ${fmtDT(Date.now())}`);
   syncSheets(false);
 }
@@ -575,7 +580,7 @@ function statNames(k){
 }
 function renderStats(){
   const k=keyOf('s');let bags=0,kgs=0,amt=0,full=0;
-  DB.families.forEach(f=>{const r=recR(k,f.id);if(r.bags)bags+=Math.floor(f.share/BAG);if(r.kg)kgs+=f.share%BAG;amt+=r.amtReceived;if(statusOf(f,k)==='full')full++});
+  DB.families.forEach(f=>{const r=recR(k,f.id);const share=quotaOf(f,k);if(r.bags)bags+=Math.floor(share/BAG);if(r.kg)kgs+=share%BAG;amt+=r.amtReceived;if(statusOf(f,k)==='full')full++});
   $('#statCards').innerHTML=`<div class="kv"><span>إجمالي الأسر بالكامل</span><b class="num">${DB.families.length}</b></div>
   <div class="kv"><span>إجمالي المبلغ المستحصل</span><b class="num">${fmt(amt)} <small>د.ع</small></b></div>
   <div class="kv"><span>الأكياس الموزعة</span><b>${bags} كيس${kgs?` و ${kgs} كغم`:''}</b></div>
