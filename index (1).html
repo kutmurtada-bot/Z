@@ -155,7 +155,7 @@ nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;st
     try{
       window.Sentry.init({
         dsn:dsn,
-        environment:/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname)?'development':'production',
+        environment:(location.hostname==='localhost'||location.hostname==='127.0.0.1')?'development':'production',
         sendDefaultPii:false,
         maxBreadcrumbs:20,
         beforeSend:function(event){
@@ -177,16 +177,19 @@ nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;st
         }
       });
       window.__flourSentryReady=true;
+      var status=document.getElementById('sentryStatus');if(status){status.textContent='مكتبة المراقبة مفعّلة ✓';status.className='ok';}
       window.removeEventListener('error',earlyError);
       window.removeEventListener('unhandledrejection',earlyRejection);
       pending.splice(0).forEach(function(error){window.__flourReportError(error,'startup');});
     }catch(error){
       window.__flourSentryInitFailed=true;
+      var status=document.getElementById('sentryStatus');if(status){status.textContent='تعذّر تهيئة المراقبة ✗';status.className='no';}
       console.warn('Error monitoring could not initialize.');
     }
   };
   sdk.onerror=function(){
     window.__flourSentryLoadFailed=true;
+    var status=document.getElementById('sentryStatus');if(status){status.textContent='تعذّر تحميل مكتبة المراقبة ✗';status.className='no';}
     console.warn('Error monitoring SDK could not be loaded.');
   };
   document.head.appendChild(sdk);
@@ -267,6 +270,11 @@ nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;st
 
 <!-- 5: الإعدادات -->
 <section class="page" id="p-set">
+  <div class="card">
+    <h3 style="margin:0 0 8px;color:var(--g)">مراقبة أخطاء التطبيق</h3>
+    <div class="kv"><span>حالة مكتبة Sentry</span><b id="sentryStatus">جارٍ الاتصال...</b></div>
+    <div class="small">تُرسل أخطاء التطبيق إلى خدمة المراقبة عند توفر الإنترنت. لا تُرسل بيانات العوائل عمداً، لكن لا يمكن تأكيد وصول البلاغات من داخل التطبيق.</div>
+  </div>
   <div class="card">
     <h3 style="margin:0 0 8px;color:var(--g)">النسخ الاحتياطي</h3>
     <div class="row">
