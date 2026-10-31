@@ -76,5 +76,5 @@ test('monthly delivery records retain their quota, payment and member-count snap
   assert.match(html, /quotaOf=\(f,k\)=>recR\(k,f\.id\)\.quotaKg\?\?f\.share/);
   assert.match(html, /amountOf=\(f,k\)=>recR\(k,f\.id\)\.amountDue\?\?f\.amount/);
   assert.match(html, /membersOf=\(f,k\)=>recR\(k,f\.id\)\.membersCount\?\?f\.members/);
-  assert.match(html, /if\(r\.quotaKg==null\)\{r\.quotaKg=f\.share;r\.amountDue=f\.amount;r\.membersCount=f\.members;\}/);
+  assert.match(html, /if\(r\.quotaKg==null\)r\.quotaKg=f\.share;if\(r\.amountDue==null\)r\.amountDue=f\.amount;if\(r\.membersCount==null\)r\.membersCount=f\.members/);
 });
