@@ -117,8 +117,81 @@ nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;st
 @keyframes pop{from{opacity:0;transform:translate(-50%,10px) scale(.95)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 
-<!-- Sentry: client-side error monitoring. The public DSN is not a secret. -->
-<script src="https://browser.sentry-cdn.com/8.47.0/bundle.min.js" crossorigin="anonymous" async onload="if(window.Sentry){Sentry.init({dsn:'https://a3994dcfff489fb7050d065b24272a1f@o4512352033112064.ingest.us.sentry.io/4512352079773696',environment:location.hostname==='localhost'?'development':'production',sendDefaultPii:false,maxBreadcrumbs:20,beforeSend:function(event){event.user=undefined;event.extra={};if(event.request){delete event.request.data;delete event.request.cookies;delete event.request.headers;delete event.request.query_string;if(event.request.url)event.request.url=event.request.url.split('?')[0];}if(event.breadcrumbs)event.breadcrumbs=event.breadcrumbs.map(function(b){if(b.data){delete b.data.body;delete b.data.query;delete b.data.response;}return b;});return event;}});}"></script>
+<!-- Sentry: load asynchronously, retain early errors, and remove personal data before sending. -->
+<script>
+(function(){
+  'use strict';
+  var dsn='https://a3994dcfff489fb7050d065b24272a1f@o4512352033112064.ingest.us.sentry.io/4512352079773696';
+  var pending=[], maxPending=10;
+  function remember(error){
+    pending.push(error instanceof Error?error:new Error('Application error before monitoring was ready'));
+    if(pending.length>maxPending)pending.shift();
+  }
+  function earlyError(event){
+    if(!window.__flourSentryReady)remember(event.error||new Error('Uncaught application error before monitoring was ready'));
+  }
+  function earlyRejection(event){
+    if(!window.__flourSentryReady)remember(event.reason instanceof Error?event.reason:new Error('Unhandled promise rejection before monitoring was ready'));
+  }
+  window.addEventListener('error',earlyError);
+  window.addEventListener('unhandledrejection',earlyRejection);
+  window.__flourReportError=function(error,area){
+    try{
+      var err=error instanceof Error?error:new Error('Handled application error');
+      if(window.Sentry&&window.__flourSentryReady){
+        window.Sentry.withScope(function(scope){
+          scope.setTag('app_area',String(area||'app').slice(0,40));
+          window.Sentry.captureException(err);
+        });
+      }else remember(err);
+    }catch(_){}
+  };
+  var sdk=document.createElement('script');
+  sdk.src='https://browser.sentry-cdn.com/8.47.0/bundle.min.js';
+  sdk.crossOrigin='anonymous';
+  sdk.async=true;
+  sdk.onload=function(){
+    if(!window.Sentry||window.__flourSentryReady)return;
+    try{
+      window.Sentry.init({
+        dsn:dsn,
+        environment:/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname)?'development':'production',
+        sendDefaultPii:false,
+        maxBreadcrumbs:20,
+        beforeSend:function(event){
+          event.user=undefined;
+          event.extra={};
+          if(event.request){
+            delete event.request.data;
+            delete event.request.cookies;
+            delete event.request.headers;
+            delete event.request.query_string;
+            if(event.request.url)event.request.url=event.request.url.split('?')[0];
+          }
+          if(event.breadcrumbs)event.breadcrumbs=event.breadcrumbs.map(function(b){
+            if(b.data){delete b.data.body;delete b.data.query;delete b.data.response;delete b.data.cookies;}
+            if(b.data&&b.data.url)b.data.url=String(b.data.url).split('?')[0];
+            return b;
+          });
+          return event;
+        }
+      });
+      window.__flourSentryReady=true;
+      window.removeEventListener('error',earlyError);
+      window.removeEventListener('unhandledrejection',earlyRejection);
+      pending.splice(0).forEach(function(error){window.__flourReportError(error,'startup');});
+    }catch(error){
+      window.__flourSentryInitFailed=true;
+      console.warn('Error monitoring could not initialize.');
+    }
+  };
+  sdk.onerror=function(){
+    window.__flourSentryLoadFailed=true;
+    console.warn('Error monitoring SDK could not be loaded.');
+  };
+  document.head.appendChild(sdk);
+})();
+</script>
 </head>
 <body>
 <header id="title">الصفحة الرئيسية</header>
@@ -483,7 +556,7 @@ async function sendTelegram(text,quiet){
   try{
     const r=await fetch(`https://api.telegram.org/bot${S.tgToken}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:S.tgChat,text})});
     const j=await r.json();if(!j.ok)throw new Error(j.description);return true;
-  }catch(e){toast('تعذّر إرسال إشعار Telegram');return false}
+  }catch(e){if(window.__flourReportError)window.__flourReportError(e,'telegram');toast('تعذّر إرسال إشعار Telegram');return false}
 }
 
 /* 4: الإحصائيات */
@@ -521,7 +594,7 @@ async function nativeSave(blob,name,share){
   await P.Share.share({title:name,files:[r.uri],dialogTitle:'حفظ أو مشاركة الملف'});
 }
 function dl(blob,name,share){
-  if(isNative()){nativeSave(blob,name,share).catch(e=>{if(!/cancel/i.test(String((e&&e.message)||e)))toast('تعذّر حفظ الملف')});return}
+  if(isNative()){nativeSave(blob,name,share).catch(e=>{if(!/cancel/i.test(String((e&&e.message)||e))){if(window.__flourReportError)window.__flourReportError(e,'file-export');toast('تعذّر حفظ الملف')}});return}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
 const crcT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
 function crc32(b){let c=-1;for(let i=0;i<b.length;i++)c=crcT[(c^b[i])&255]^(c>>>8);return(c^-1)>>>0}
@@ -634,8 +707,8 @@ async function syncSheets(manual){
   if(!S.sheetUrl){if(manual)toast('أدخل رابط Google Sheets أولاً');return}
   try{
     await fetch(S.sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'sync',data:DB})});
-    if(manual)toast('تم إرسال البيانات إلى Google Sheets ✓');
-  }catch(e){if(manual)toast('تعذّرت المزامنة — تأكد من الاتصال بالإنترنت')}
+    if(manual)toast('أُرسل طلب المزامنة؛ لكن لا يمكن تأكيد حفظه من التطبيق');
+  }catch(e){if(window.__flourReportError)window.__flourReportError(e,'google-sheets-sync');if(manual)toast('تعذّرت المزامنة — تأكد من الاتصال بالإنترنت')}
 }
 async function restoreSheets(){
   try{
@@ -643,7 +716,7 @@ async function restoreSheets(){
     if(!d||!Array.isArray(d.families))throw 0;
     window._pendFull=d;
     openModal(`<h3>استعادة من Google Sheets</h3><p>تم العثور على ${d.families.length} عائلة. سيتم استبدال البيانات الحالية. متابعة؟</p><div class="row"><button onclick="applyFull()">نعم</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
-  }catch(e){toast('تعذّرت الاستعادة — لا توجد بيانات أو الرابط غير جاهز')}
+  }catch(e){if(window.__flourReportError)window.__flourReportError(e,'google-sheets-restore');toast('تعذّرت الاستعادة — لا توجد بيانات أو الرابط غير جاهز')}
 }
 function saveTelegram(){S.tgToken=$('#tgToken').value.trim();S.tgChat=$('#tgChat').value.trim();saveS();toast('تم حفظ إعدادات Telegram على هذا الجهاز ✓')}
 async function testTelegram(){saveTelegram();if(await sendTelegram('✅ رسالة تجريبية من تطبيق توزيع الطحين'))toast('تم إرسال الرسالة التجريبية ✓')}
