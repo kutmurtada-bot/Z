@@ -396,7 +396,7 @@ function editFam(id){
 function saveEdit(id){
   const f=fam(id),n=$('#eName').value.trim(),m=parseInt($('#eMem').value);
   if(!n)return toast('أدخل الاسم');if(!(m>=1))return toast('عدد الأفراد غير صحيح');
-  f.name=n;f.members=m;f.page=$('#ePage').value.trim();f.notes=$('#eNotes').value.trim();
+  f.name=n;f.members=m;f.share=m*KG_PER_PERSON;f.amount=m*IQD_PER_PERSON;f.page=$('#ePage').value.trim();f.notes=$('#eNotes').value.trim();
   save();closeModal();renderFamilies();toast('تم حفظ التعديل ✓');
 }
 function changesFam(id){
