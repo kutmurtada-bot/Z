@@ -135,3 +135,43 @@ test('handles a 54 kg quota as one bag plus 4 kg remainder', async ({ page }) =>
   await expect(card).toContainText('54 كغم');
   await expect(card).toContainText('1,500 د.ع');
 });
+
+test('editing a family member count recalculates its quota and payment', async ({ page }) => {
+  await page.locator('#aName').fill('عائلة تعديل العدد');
+  await page.locator('#aMembers').fill('4');
+  await page.getByRole('button', { name: 'إضافة عائلة' }).click();
+  await page.locator('#nav button[data-p="fam"]').click();
+  let card = page.locator('#famList .card').filter({ hasText: 'عائلة تعديل العدد' });
+  await expect(card).toContainText('36 كغم');
+  await expect(card).toContainText('1,000 د.ع');
+  await card.getByRole('button', { name: 'تعديل التفاصيل بالكامل' }).click();
+  await page.locator('#eMem').fill('5');
+  await page.locator('#modalBox').getByRole('button', { name: 'حفظ' }).click();
+  card = page.locator('#famList .card').filter({ hasText: 'عائلة تعديل العدد' });
+  await expect(card).toContainText('45 كغم');
+  await expect(card).toContainText('1,250 د.ع');
+});
+
+test('Sentry SDK initializes and receives handled app errors when the CDN is available', async ({ page }) => {
+  await page.unroute('https://browser.sentry-cdn.com/**');
+  await page.route('https://browser.sentry-cdn.com/8.47.0/bundle.min.js', route => route.fulfill({
+    status: 200,
+    contentType: 'application/javascript',
+    body: `window.Sentry = {
+      init: function(options) { window.__sentryOptions = options; },
+      withScope: function(callback) { callback({ setTag: function() {} }); },
+      captureException: function(error) { window.__sentryCaptured = error.message; }
+    };`
+  }));
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => window.__flourSentryReady)).toBe(true);
+  await page.evaluate(() => window.__flourReportError(new Error('QA synthetic exception'), 'qa-test'));
+  await expect.poll(() => page.evaluate(() => window.__sentryCaptured)).toBe('QA synthetic exception');
+  const options = await page.evaluate(() => ({
+    pii: window.__sentryOptions.sendDefaultPii,
+    environment: window.__sentryOptions.environment,
+    beforeSend: typeof window.__sentryOptions.beforeSend
+  }));
+  expect(options.pii).toBe(false);
+  expect(options.beforeSend).toBe('function');
+});
