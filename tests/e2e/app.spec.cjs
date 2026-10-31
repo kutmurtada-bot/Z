@@ -112,17 +112,26 @@ test('handles an 81 kg quota in bag and remainder stages without losing payment 
   await expect(card).toContainText('2,250 د.ع');
 });
 
-test('handles an exact 50 kg quota as one bag with no remainder checkbox', async ({ page }) => {
-  await page.locator('#aName').fill('عائلة 50 كغم');
+test('handles a 54 kg quota as one bag plus 4 kg remainder', async ({ page }) => {
+  await page.locator('#aName').fill('عائلة 54 كغم');
   await page.locator('#aMembers').fill('6');
   await page.getByRole('button', { name: 'إضافة عائلة' }).click();
   await page.locator('#nav button[data-p="dist"]').click();
-  await page.locator('#distSearch').fill('عائلة 50 كغم');
-  const card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 50 كغم' });
-  await expect(card).toContainText('50 كغم');
+  await page.locator('#distSearch').fill('عائلة 54 كغم');
+  let card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 54 كغم' });
+  await expect(card).toContainText('54 كغم');
+  await expect(card).toContainText('1 كيس و 4 كغم');
   await expect(card.locator('input[id^="b_"]')).toBeEnabled();
-  await expect(card.locator('input[id^="k_"]')).toBeDisabled();
+  await expect(card.locator('input[id^="k_"]')).toBeEnabled();
   await card.locator('input[id^="b_"]').check();
   await card.getByRole('button', { name: 'تسليم وتسجيل الاستلام' }).click();
-  await expect(page.locator('#distList .card.sub').filter({ hasText: 'عائلة 50 كغم' })).toContainText('مستلم بالكامل');
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 54 كغم' });
+  await expect(card).toContainText('مستلم جزئي');
+  await expect(card).toContainText('50 كغم');
+  await card.locator('input[id^="k_"]').check();
+  await card.getByRole('button', { name: 'تسليم وتسجيل الاستلام' }).click();
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة 54 كغم' });
+  await expect(card).toContainText('مستلم بالكامل');
+  await expect(card).toContainText('54 كغم');
+  await expect(card).toContainText('1,500 د.ع');
 });
