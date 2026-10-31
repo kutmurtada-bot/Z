@@ -194,3 +194,38 @@ test('Sentry SDK initializes and receives handled app errors when the CDN is ava
   expect(result.requestUrlClean).toBe(true);
   expect(result.breadcrumbClean).toBe(true);
 });
+
+test('changing family size does not rewrite an already recorded month', async ({ page }) => {
+  await page.locator('#aName').fill('عائلة سجل شهري');
+  await page.locator('#aMembers').fill('4');
+  await page.getByRole('button', { name: 'إضافة عائلة' }).click();
+  await page.locator('#nav button[data-p="dist"]').click();
+  await page.locator('#distSearch').fill('عائلة سجل شهري');
+  let card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة سجل شهري' });
+  await card.locator('input[id^="k_"]').check();
+  await card.getByRole('button', { name: 'تسليم وتسجيل الاستلام' }).click();
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة سجل شهري' });
+  await expect(card).toContainText('مستلم بالكامل');
+  await page.locator('#nav button[data-p="fam"]').click();
+  const family = page.locator('#famList .card').filter({ hasText: 'عائلة سجل شهري' });
+  await family.getByRole('button', { name: 'تعديل التفاصيل بالكامل' }).click();
+  await page.locator('#eMem').fill('5');
+  await page.locator('#modalBox').getByRole('button', { name: 'حفظ' }).click();
+  await page.locator('#nav button[data-p="dist"]').click();
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة سجل شهري' });
+  await expect(card).toContainText('عدد أفراد الأسرة');
+  await expect(card).toContainText('36 كغم');
+  await expect(card).toContainText('1,000 د.ع');
+  await expect(card).toContainText('مستلم بالكامل');
+  const next = await page.evaluate(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return { year: String(d.getFullYear()), month: String(d.getMonth() + 1) };
+  });
+  await page.locator('#dYear').selectOption(next.year);
+  await page.locator('#dMonth').selectOption(next.month);
+  card = page.locator('#distList .card.sub').filter({ hasText: 'عائلة سجل شهري' });
+  await expect(card).toContainText('45 كغم');
+  await expect(card).toContainText('1,250 د.ع');
+  await expect(card).toContainText('غير مستلم');
+});
