@@ -1,0 +1,40 @@
+name: Flour App QA
+on:
+  push:
+    branches: [main, "qa/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * *"
+permissions:
+  contents: read
+concurrency:
+  group: flour-qa-\${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  quality-checks:
+    name: Static checks and application tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify app files exist
+        run: |
+          test -s "index (1).html"
+          test -s "capacitor.config.json"
+      - name: Install QA dependencies
+        run: npm install
+      - name: Run JavaScript syntax check
+        run: npm run test:syntax
+      - name: Run unit and regression tests
+        run: npm test
+      - name: Install Chromium for browser tests
+        run: npx playwright install --with-deps chromium
+      - name: Run real browser end-to-end tests
+        run: npm run test:e2e

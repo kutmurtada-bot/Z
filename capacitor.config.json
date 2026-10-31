@@ -1,0 +1,13 @@
+{
+  "appId": "com.flourapp.distribution",
+  "appName": "توزيع الطحين",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

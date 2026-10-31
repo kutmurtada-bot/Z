@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f9d78"><meta name="color-scheme" content="light only"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"><title>توزيع الطحين</title>
+<style>
+:root{--g:#1f7a4d;--g2:#e8f5ee;--bg:#f3f5f4;--tx:#1d2b24;--mu:#6b7a72;--bd:#d8e0db;--rd:#c0392b;--or:#d9822b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Tahoma,"Segoe UI",Arial,sans-serif;font-size:16px;padding-bottom:84px}
+header{background:var(--g);color:#fff;padding:14px 16px;font-size:19px;font-weight:700;position:sticky;top:0;z-index:5}
+.page{display:none;padding:14px}.page.active{display:block}
+.card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+label.f{display:block;font-weight:700;margin:10px 0 5px;font-size:15px}
+input[type=text],input[type=number],input[type=search],input[type=password],select,textarea{width:100%;padding:12px;border:1px solid var(--bd);border-radius:10px;font:inherit;background:#fff}
+textarea{min-height:80px}
+button{font:inherit;border:0;border-radius:10px;padding:12px 14px;background:var(--g);color:#fff;font-weight:700;cursor:pointer}
+button.sec{background:#fff;color:var(--g);border:1.5px solid var(--g)}
+button.red{background:var(--rd)}button.or{background:var(--or)}
+button.full{width:100%;margin-top:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.kv:last-child{border:0}.kv span:first-child{color:var(--mu)}.kv b{text-align:left}
+.name{font-size:18px;font-weight:800;color:var(--g);margin-bottom:6px}
+.badge{display:inline-block;padding:3px 12px;border-radius:20px;color:#fff;font-size:14px;font-weight:700}
+.b-full{background:var(--g)}.b-partial{background:var(--or)}.b-none{background:var(--rd)}
+.chk{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--bd);border-radius:10px;margin:8px 0;background:#fafcfb}
+.chk input{width:22px;height:22px;accent-color:var(--g)}
+nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:8px 2px;font-size:12px;font-weight:600}
+nav button span{display:block;font-size:21px}
+nav button.on{color:var(--g)}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+#modal.show{display:flex}
+#modalBox{background:#fff;border-radius:16px;padding:18px;width:100%;max-width:440px;max-height:88vh;overflow:auto}
+#modalBox h3{margin:0 0 8px;color:var(--g)}
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 18px;border-radius:24px;z-index:30;display:none;max-width:90%;text-align:center}
+.hint{color:var(--mu);text-align:center;padding:20px}
+.group{border:2px solid var(--g);border-radius:16px;padding:10px;margin-bottom:14px;background:var(--g2)}
+.sub{margin-top:8px}
+details{background:#fff;border:1px solid var(--bd);border-radius:12px;margin-bottom:10px;padding:4px 12px}
+summary{font-weight:700;padding:10px 0;cursor:pointer}
+ol{margin:8px 0;padding:0 24px 0 0}li{padding:5px 0;border-bottom:1px dashed var(--bd)}
+.num{font-size:28px;font-weight:800;color:var(--g)}
+.ok{color:var(--g);font-weight:700}.no{color:var(--rd);font-weight:700}
+.small{font-size:13px;color:var(--mu);line-height:1.7}
+
+/* ===== التصميم العصري ===== */
+:root{--g:#0f9d78;--g2:#e6f7f1;--bg:#f3f7f5;--tx:#0e1f1a;--mu:#6c7f77;--bd:#e2ebe7;--card:#fff;--rd:#e5484d;--or:#f5a524;
+--sh:0 10px 30px -12px rgba(10,70,52,.22);--grad:linear-gradient(135deg,#19c493,#0b8266)}
+html{scroll-behavior:smooth;color-scheme:light only}
+body{font-family:'Tajawal','IBM Plex Sans Arabic',Tahoma,"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:120px;font-size:16px;line-height:1.6}
+header{position:relative;background:var(--grad);color:#fff;padding:calc(env(safe-area-inset-top) + 22px) 22px 34px;font-size:24px;font-weight:800;border-radius:0 0 34px 34px;overflow:hidden;box-shadow:0 14px 34px -14px rgba(11,130,102,.7);letter-spacing:.2px}
+header::before,header::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.12);pointer-events:none}
+header::before{width:190px;height:190px;left:-60px;top:-90px}
+header::after{width:120px;height:120px;right:-30px;bottom:-70px;background:rgba(255,255,255,.09)}
+.page{padding:20px 16px}
+.page.active{animation:up .4s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:18px;box-shadow:var(--sh);margin-bottom:14px}
+label.f{color:var(--mu);font-size:13.5px;font-weight:700;margin:14px 0 6px}
+input[type=text],input[type=number],input[type=search],input[type=password],select,textarea{background:var(--bg);color:var(--tx);border:1.5px solid transparent;border-radius:16px;padding:14px 16px;font-size:16px;transition:.2s;outline:none;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{background:var(--card);border-color:var(--g);box-shadow:0 0 0 4px rgba(15,157,120,.16)}
+input::placeholder,textarea::placeholder{color:var(--mu);opacity:.8}
+input[type=search]{padding-right:46px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c7f77' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;background-size:20px;background-color:var(--card);border-color:var(--bd);box-shadow:var(--sh)}
+select{padding-left:40px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c7f77' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 14px center;background-size:18px}
+button{background:var(--grad);border-radius:16px;padding:14px 16px;font-weight:700;box-shadow:0 10px 20px -10px rgba(11,130,102,.8);transition:transform .15s,box-shadow .15s,filter .2s}
+button:active{transform:scale(.96);filter:brightness(.95)}
+button.sec{background:var(--card);color:var(--g);border:1.5px solid var(--bd);box-shadow:none}
+button.sec:active{background:var(--g2)}
+button.red{background:linear-gradient(135deg,#f26a6f,#d63a40);box-shadow:0 10px 20px -10px rgba(214,58,64,.8)}
+button.or{background:linear-gradient(135deg,#f9b94b,#e8901a);box-shadow:0 10px 20px -10px rgba(232,144,26,.8)}
+button.full{margin-top:18px;padding:16px;font-size:17px;border-radius:18px}
+.kv{border-bottom:1px solid var(--bd);padding:10px 0}
+.kv span:first-child{font-size:14px}
+.name{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800;color:var(--tx);margin-bottom:8px}
+.name::before{content:"";width:6px;height:24px;border-radius:4px;background:var(--grad);flex:none}
+.badge{padding:4px 14px;font-size:13.5px}
+.b-full{background:rgba(15,157,120,.15);color:#0b8266}
+.b-partial{background:rgba(245,165,36,.18);color:#b9770e}
+.b-none{background:rgba(229,72,77,.14);color:#d13338}
+.chk{background:var(--bg);border:1.5px solid transparent;border-radius:18px;padding:14px;transition:.2s}
+.chk:has(input:checked){background:var(--g2);border-color:var(--g)}
+.chk input{-webkit-appearance:none;appearance:none;width:26px;height:26px;border:2px solid var(--bd);border-radius:9px;background:var(--card);flex:none;transition:.2s;margin:0}
+.chk input:checked{background:var(--grad) ;border-color:transparent;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");background-size:16px;background-repeat:no-repeat;background-position:center}
+.chk input:disabled{opacity:.55}
+.group{background:linear-gradient(180deg,var(--g2),transparent 70%);border:1.5px solid rgba(15,157,120,.45);border-radius:30px;padding:14px}
+.sub{box-shadow:none}
+details{background:var(--card);border:1px solid var(--bd);border-radius:20px;box-shadow:var(--sh);padding:4px 16px;margin-bottom:12px}
+summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";width:9px;height:9px;border:solid var(--mu);border-width:0 2.4px 2.4px 0;transform:rotate(45deg);transition:.25s;margin-top:-4px}
+details[open] summary::after{transform:rotate(-135deg);margin-top:4px}
+details input[type=search]{box-shadow:none;background-color:var(--bg)}
+li{border-bottom:1px solid var(--bd);padding:9px 0}
+li::marker{color:var(--g);font-weight:700}
+.hint{background:var(--card);border:1.5px dashed var(--bd);border-radius:24px;padding:42px 16px;color:var(--mu)}
+.num{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:32px;font-weight:800;line-height:1.2}
+#statCards{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0;background:none;border:0;box-shadow:none}
+#statCards .kv{flex-direction:column;align-items:flex-start;gap:4px;background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:16px;box-shadow:var(--sh)}
+#statCards .kv b{text-align:right}
+.small{background:var(--g2);padding:10px 14px;border-radius:14px;color:var(--mu)}
+.ok{color:#0b8266}.no{color:#d13338}
+nav{left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 12px);border:1px solid var(--bd);border-radius:28px;padding:6px;gap:4px;background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 18px 40px -14px rgba(10,60,45,.4)}
+nav button{background:none;box-shadow:none;border-radius:22px;padding:9px 2px 7px;font-size:11.5px;color:var(--mu);transition:.25s}
+nav button:active{transform:scale(.92)}
+nav button.on{background:var(--g2);color:var(--g)}
+nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 3px}
+#modal{align-items:flex-end;padding:0;background:rgba(5,20,15,.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+#modal.show{animation:fade .25s}
+#modalBox{background:var(--card);color:var(--tx);border-radius:30px 30px 0 0;max-width:560px;padding:26px 20px calc(env(safe-area-inset-bottom) + 24px);animation:sheet .35s cubic-bezier(.2,.8,.2,1);position:relative;max-height:90vh}
+#modalBox::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:var(--bd);margin:-14px auto 14px}
+#modalBox h3{font-size:20px;color:var(--tx)}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+#toast{bottom:112px;background:rgba(12,28,22,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-radius:18px;padding:12px 20px;box-shadow:0 14px 30px -10px rgba(0,0,0,.5);font-weight:600;animation:pop .3s cubic-bezier(.2,.8,.2,1)}
+@keyframes pop{from{opacity:0;transform:translate(-50%,10px) scale(.95)}to{opacity:1;transform:translate(-50%,0)}}
+</style>
+
+<!-- Sentry: client-side error monitoring. The public DSN is not a secret. -->
+<script src="https://browser.sentry-cdn.com/8.47.0/bundle.min.js" crossorigin="anonymous" async onload="if(window.Sentry){Sentry.init({dsn:'https://a3994dcfff489fb7050d065b24272a1f@o4512352033112064.ingest.us.sentry.io/4512352079773696',environment:location.hostname==='localhost'?'development':'production',sendDefaultPii:false,maxBreadcrumbs:20,beforeSend:function(event){event.user=undefined;event.extra={};if(event.request){delete event.request.data;delete event.request.cookies;delete event.request.headers;delete event.request.query_string;if(event.request.url)event.request.url=event.request.url.split('?')[0];}if(event.breadcrumbs)event.breadcrumbs=event.breadcrumbs.map(function(b){if(b.data){delete b.data.body;delete b.data.query;delete b.data.response;}return b;});return event;}});}"></script>
+</head>
+<body>
+<header id="title">الصفحة الرئيسية</header>
+
+<!-- 1: الرئيسية -->
+<section class="page active" id="p-home">
+  <div class="card">
+    <label class="f">اسم رب الأسرة</label><input type="text" id="aName">
+    <label class="f">عدد أفراد الأسرة</label><input type="number" id="aMembers" min="1" inputmode="numeric">
+    <label class="f">رقم الصفحة</label><input type="text" id="aPage" inputmode="numeric">
+    <label class="f">الملاحظات</label><textarea id="aNotes"></textarea>
+    <button class="full" onclick="addFamily()">إضافة عائلة</button>
+  </div>
+</section>
+
+<!-- 2: العوائل -->
+<section class="page" id="p-fam">
+  <input type="search" id="famSearch" placeholder="ابحث عن عائلة..." oninput="renderFamilies()">
+  <div class="row" style="margin:10px 0">
+    <button class="sec" onclick="backupFamilies()">⬇ نسخ احتياطي (العوائل)</button>
+    <button class="sec" onclick="$('#famRestoreFile').click()">⬆ استعادة البيانات</button>
+  </div>
+  <input type="file" id="famRestoreFile" accept=".json,application/json" hidden onchange="restoreFamilies(this)">
+  <div id="famList"></div>
+</section>
+
+<!-- 3: التوزيع -->
+<section class="page" id="p-dist">
+  <div class="card">
+    <div class="row">
+      <div><label class="f">السنة</label><select id="dYear" onchange="renderDist()"></select></div>
+      <div><label class="f">الشهر</label><select id="dMonth" onchange="renderDist()"></select></div>
+    </div>
+    <label class="f">اسم الموزع</label>
+    <input type="text" id="dName" oninput="saveDistMeta()" placeholder="يُحفظ تلقائياً">
+    <div class="small" id="dInfo" style="margin-top:6px"></div>
+  </div>
+  <input type="search" id="distSearch" placeholder="ابحث عن العائلة للتوزيع..." oninput="renderDist()">
+  <div id="distList" style="margin-top:12px"></div>
+</section>
+
+<!-- 4: الإحصائيات -->
+<section class="page" id="p-stats">
+  <div class="card">
+    <div class="row">
+      <div><label class="f">السنة</label><select id="sYear" onchange="renderStats()"></select></div>
+      <div><label class="f">الشهر</label><select id="sMonth" onchange="renderStats()"></select></div>
+    </div>
+  </div>
+  <div class="card" id="statCards"></div>
+  <div id="statLists"></div>
+  <div class="card">
+    <h3 style="margin:0 0 4px;color:var(--g)">تصدير القوائم</h3>
+    <label class="f">صيغة الملف</label>
+    <select id="expFmt">
+      <option value="docx">Word (.docx)</option><option value="xlsx">Excel (.xlsx)</option>
+      <option value="pdf">PDF (.pdf)</option><option value="txt">نص (.txt)</option><option value="html">HTML (.html)</option>
+    </select>
+    <label class="f">القائمة المطلوبة</label>
+    <select id="expList">
+      <option value="all">أسماء الأسر بالكامل</option>
+      <option value="full">الأسر المستلمة بالكامل</option>
+      <option value="partial">الأسر المستلمة جزئياً</option>
+      <option value="none">الأسر غير المستلمة إطلاقاً</option>
+    </select>
+    <div class="row" style="margin-top:14px">
+      <button onclick="exportFile('download')">⬇ تنزيل</button>
+      <button class="sec" onclick="exportFile('share')">↗ مشاركة / تصدير</button>
+      <button class="sec" onclick="exportFile('print')">🖨 طباعة</button>
+    </div>
+  </div>
+</section>
+
+<!-- 5: الإعدادات -->
+<section class="page" id="p-set">
+  <div class="card">
+    <h3 style="margin:0 0 8px;color:var(--g)">النسخ الاحتياطي</h3>
+    <div class="row">
+      <button onclick="backupFull()">إنشاء نسخة احتياطية</button>
+      <button class="sec" onclick="$('#fullRestoreFile').click()">استعادة النسخة الكاملة من الهاتف</button>
+    </div>
+    <input type="file" id="fullRestoreFile" accept=".json,application/json" hidden onchange="restoreFull(this)">
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 8px;color:var(--g)">المزامنة Google Sheets</h3>
+    <label class="f">رابط Google Sheets (Apps Script)</label>
+    <input type="text" id="sheetUrl" dir="ltr">
+    <button class="full" onclick="saveSheetUrl()">حفظ ربط الرابط</button>
+    <div class="kv" style="margin-top:10px"><span>حالة المزامنة</span><b id="sheetStatus">—</b></div>
+    <div class="row" style="margin-top:10px">
+      <button onclick="syncSheets(true)">مزامنة كل البيانات الآن</button>
+      <button class="sec" onclick="restoreSheets()">استعادة من Google Sheets</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin:0 0 8px;color:var(--g)">إشعارات Telegram</h3>
+    <div class="small">أدخل رمز البوت الجديد بعد إلغاء الرمز القديم من BotFather. يُحفظ الرمز على هذا الجهاز ولا يُرسل إلى Google Sheets.</div>
+    <label class="f">رمز بوت Telegram الجديد</label>
+    <input type="password" id="tgToken" dir="ltr" autocomplete="off">
+    <label class="f">معرّف الدردشة (Chat ID)</label>
+    <input type="text" id="tgChat" dir="ltr" inputmode="numeric">
+    <button class="full" onclick="saveTelegram()">حفظ رمز Telegram</button>
+    <button class="sec full" onclick="testTelegram()">إرسال رسالة تجريبية</button>
+  </div>
+</section>
+
+<nav id="nav">
+  <button data-p="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>الرئيسية</button>
+  <button data-p="fam"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.5a5 5 0 0 1 4.5 5"/></svg>العوائل</button>
+  <button data-p="dist"><svg viewBox="0 0 24 24"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>التوزيع</button>
+  <button data-p="stats"><svg viewBox="0 0 24 24"><path d="M4 20V11M10 20V4M16 20v-6M22 20H2"/></svg>الإحصائيات</button>
+  <button data-p="set"><svg viewBox="0 0 24 24"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.2"/><circle cx="10" cy="12" r="2.2"/><circle cx="18" cy="18" r="2.2"/></svg>الإعدادات</button>
+</nav>
+
+<div id="modal"><div id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const KEY='flourDB_v1',SKEY='flourSettings_v1';
+const DEFAULT_SHEET='https://script.google.com/macros/s/AKfycbznQEkShjF-xUKw6oqso3JF8F31Gde44X9k23e41LhGQbSF8SHQ4VacNKlEAMklmOKa/exec';
+const KG_PER_PERSON=9,IQD_PER_PERSON=250,BAG=50;
+const MONTHS=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const LT={all:'أسماء الأسر بالكامل',full:'الأسر المستلمة بالكامل',partial:'الأسر المستلمة جزئياً',none:'الأسر غير المستلمة إطلاقاً'};
+const TITLES={home:'الصفحة الرئيسية',fam:'العوائل',dist:'صفحة التوزيع',stats:'الإحصائيات',set:'الإعدادات'};
+
+let DB=loadDB(),S=loadS();
+function fresh(){return{families:[],records:{},meta:{}}}
+function loadDB(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&Array.isArray(d.families))return{families:d.families,records:d.records||{},meta:d.meta||{}}}catch(e){}return fresh()}
+function loadS(){try{const s=JSON.parse(localStorage.getItem(SKEY));if(s)return Object.assign({sheetUrl:DEFAULT_SHEET,tgToken:'',tgChat:''},s)}catch(e){}return{sheetUrl:DEFAULT_SHEET,tgToken:'',tgChat:''}}
+function save(){localStorage.setItem(KEY,JSON.stringify(DB))}
+function saveS(){localStorage.setItem(SKEY,JSON.stringify(S))}
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>(s||'').toString().replace(/[\u064B-\u065F\u0670]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').toLowerCase().trim();
+const fmt=n=>Number(n||0).toLocaleString('en-US');
+const fam=id=>DB.families.find(f=>f.id===id);
+const detail=share=>`${Math.floor(share/BAG)} كيس و ${share%BAG} كغم`;
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)}
+function openModal(h){$('#modalBox').innerHTML=h;$('#modal').classList.add('show')}
+function closeModal(){$('#modal').classList.remove('show')}
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+/* التنقل */
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.p));
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='p-'+p));
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.p===p));
+  $('#title').textContent=TITLES[p];window.scrollTo(0,0);
+  if(p==='fam')renderFamilies();if(p==='dist')renderDist();if(p==='stats')renderStats();if(p==='set')loadSettingsUI();
+}
+
+/* 1: إضافة */
+function addFamily(){
+  const name=$('#aName').value.trim(),members=parseInt($('#aMembers').value),page=$('#aPage').value.trim(),notes=$('#aNotes').value.trim();
+  if(!name)return toast('أدخل اسم رب الأسرة');
+  if(!(members>=1))return toast('أدخل عدد أفراد الأسرة');
+  DB.families.push({id:uid(),name,members,page,notes,share:members*KG_PER_PERSON,amount:members*IQD_PER_PERSON,children:[],parentId:null});
+  save();['aName','aMembers','aPage','aNotes'].forEach(i=>$('#'+i).value='');
+  toast('تمت إضافة العائلة ✓');
+}
+
+/* 2: العوائل */
+function renderFamilies(){
+  const q=norm($('#famSearch').value);
+  const list=DB.families.filter(f=>!q||norm(f.name+' '+f.page).includes(q));
+  if(!list.length){$('#famList').innerHTML='<div class="hint">لا توجد عوائل</div>';return}
+  $('#famList').innerHTML=list.map(f=>{
+    const kids=f.children.map(fam).filter(Boolean).map(c=>esc(c.name)).join('، ');
+    return `<div class="card"><div class="name">${esc(f.name)}</div>
+    <div class="kv"><span>رقم الصفحة</span><b>${esc(f.page)||'—'}</b></div>
+    <div class="kv"><span>عدد أفراد الأسرة</span><b>${f.members}</b></div>
+    <div class="kv"><span>حصة الطحين الشهرية</span><b>${f.share} كغم</b></div>
+    <div class="kv"><span>التفصيل</span><b>${detail(f.share)}</b></div>
+    <div class="kv"><span>المبلغ المستحق</span><b>${fmt(f.amount)} د.ع</b></div>
+    ${kids?`<div class="kv"><span>العوائل المرتبطة</span><b>${kids}</b></div>`:''}
+    <div class="row" style="margin-top:10px">
+      <button class="sec" onclick="editFam('${f.id}')">✏️ تعديل التفاصيل بالكامل</button>
+      <button class="sec" onclick="changesFam('${f.id}')">± المتغيرات</button>
+      <button class="sec" onclick="linkFam('${f.id}')">🔗 ربط العوائل</button>
+      <button class="red" onclick="delFam('${f.id}')">🗑 حذف العائلة بالكامل</button>
+    </div></div>`}).join('');
+}
+function editFam(id){
+  const f=fam(id);
+  openModal(`<h3>تعديل التفاصيل</h3>
+  <label class="f">الاسم</label><input type="text" id="eName" value="${esc(f.name)}">
+  <label class="f">عدد أفراد الأسرة</label><input type="number" id="eMem" min="1" value="${f.members}">
+  <label class="f">رقم الصفحة</label><input type="text" id="ePage" value="${esc(f.page)}">
+  <label class="f">الملاحظات</label><textarea id="eNotes">${esc(f.notes)}</textarea>
+  <div class="small">لا يغيّر هذا التعديل الحصة الشهرية ولا المبلغ المستحق (يتم ذلك من زر المتغيرات).</div>
+  <div class="row" style="margin-top:12px"><button onclick="saveEdit('${id}')">حفظ</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
+}
+function saveEdit(id){
+  const f=fam(id),n=$('#eName').value.trim(),m=parseInt($('#eMem').value);
+  if(!n)return toast('أدخل الاسم');if(!(m>=1))return toast('عدد الأفراد غير صحيح');
+  f.name=n;f.members=m;f.page=$('#ePage').value.trim();f.notes=$('#eNotes').value.trim();
+  save();closeModal();renderFamilies();toast('تم حفظ التعديل ✓');
+}
+function changesFam(id){
+  openModal(`<h3>المتغيرات</h3><div class="row"><button onclick="chgStep('${id}','add')">➕ إضافة فرد</button><button class="or" onclick="chgStep('${id}','del')">➖ حذف فرد</button></div>
+  <button class="sec full" onclick="closeModal()">إغلاق</button>`);
+}
+function chgStep(id,type){
+  const opts=Array.from({length:20},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');
+  openModal(`<h3>${type==='add'?'إضافة فرد':'حذف فرد'}</h3><label class="f">اختر العدد (1–20)</label>
+  <select onchange="applyChg('${id}','${type}',this.value)"><option value="">— اختر —</option>${opts}</select>
+  <button class="sec full" onclick="closeModal()">إلغاء</button>`);
+}
+function applyChg(id,type,v){
+  const n=parseInt(v);if(!n)return;const f=fam(id);
+  if(type==='add'){f.members+=n;f.share+=n*KG_PER_PERSON;f.amount+=n*IQD_PER_PERSON}
+  else{if(f.members-n<1)return toast('لا يمكن حذف هذا العدد');f.members-=n;f.share=Math.max(0,f.share-n*KG_PER_PERSON);f.amount=Math.max(0,f.amount-n*IQD_PER_PERSON)}
+  save();closeModal();renderFamilies();toast(`أصبح عدد الأفراد ${f.members} — الحصة ${f.share} كغم — ${fmt(f.amount)} د.ع`);
+}
+function delFam(id){
+  openModal(`<h3>تحذير</h3><p>هل تود بالفعل حذف هذه العائلة؟ لا يمكن التراجع بعد الحذف.</p>
+  <div class="row"><button class="red" onclick="doDel('${id}')">نعم</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
+}
+function doDel(id){
+  const f=fam(id);
+  if(f.parentId){const p=fam(f.parentId);if(p)p.children=p.children.filter(x=>x!==id)}
+  f.children.forEach(c=>{const x=fam(c);if(x)x.parentId=null});
+  DB.families=DB.families.filter(x=>x.id!==id);
+  save();closeModal();renderFamilies();toast('تم حذف العائلة');
+}
+let linkSel=new Set();
+function linkFam(id){
+  const f=fam(id);
+  if(f.parentId){const p=fam(f.parentId);return openModal(`<h3>ربط العوائل</h3><p>هذه العائلة مرتبطة مسبقاً بعائلة <b>${esc(p?p.name:'')}</b>، ولا يمكن أن تكون أصلية.</p><button class="full" onclick="closeModal()">حسناً</button>`)}
+  linkSel=new Set(f.children);
+  openModal(`<h3>ربط عائلة بـ ${esc(f.name)}</h3><input type="search" id="lkQ" placeholder="ابحث عن العائلة..." oninput="renderLinkList('${id}')">
+  <div id="lkList" style="margin-top:8px"></div>
+  <div class="row" style="margin-top:12px"><button onclick="saveLinks('${id}')">حفظ المعلومات</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
+  renderLinkList(id);
+}
+function renderLinkList(id){
+  const q=norm($('#lkQ').value);
+  const c=DB.families.filter(x=>x.id!==id&&!x.children.length&&(!x.parentId||x.parentId===id)&&(!q||norm(x.name+' '+x.page).includes(q)));
+  $('#lkList').innerHTML=c.length?c.map(x=>`<label class="chk"><input type="checkbox" ${linkSel.has(x.id)?'checked':''} onchange="this.checked?linkSel.add('${x.id}'):linkSel.delete('${x.id}')"><span>${esc(x.name)} <small>(${x.members} أفراد)</small></span></label>`).join(''):'<div class="hint">لا نتائج</div>';
+}
+function saveLinks(id){
+  const f=fam(id);
+  f.children.forEach(c=>{const x=fam(c);if(x&&!linkSel.has(c))x.parentId=null});
+  linkSel.forEach(c=>{const x=fam(c);if(x)x.parentId=id});
+  f.children=[...linkSel].filter(c=>fam(c));
+  save();closeModal();renderFamilies();toast('تم حفظ الربط ✓');
+}
+function backupFamilies(){dl(new Blob([JSON.stringify({type:'families',families:DB.families},null,1)],{type:'application/json'}),`عوائل-نسخة-${new Date().toISOString().slice(0,10)}.json`)}
+function readJson(inp,cb){const f=inp.files[0];inp.value='';if(!f)return;const r=new FileReader();r.onload=()=>{try{cb(JSON.parse(r.result))}catch(e){toast('الملف غير صالح')}};r.readAsText(f)}
+function restoreFamilies(inp){readJson(inp,d=>{
+  if(!Array.isArray(d.families))return toast('الملف لا يحتوي بيانات عوائل');
+  openModal(`<h3>استعادة العوائل</h3><p>سيتم استبدال قائمة العوائل الحالية (${DB.families.length}) بالقائمة الموجودة في الملف (${d.families.length}). متابعة؟</p><div class="row"><button onclick="applyFamRestore()">نعم</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
+  window._pendFam=d.families;
+})}
+function applyFamRestore(){DB.families=window._pendFam;save();closeModal();renderFamilies();toast('تمت استعادة العوائل ✓')}
+
+/* 3: التوزيع */
+function fillSelects(){
+  const y=new Date().getFullYear(),m=new Date().getMonth()+1;
+  ['d','s'].forEach(p=>{
+    $('#'+p+'Year').innerHTML=Array.from({length:7},(_,i)=>y-2+i).map(v=>`<option ${v===y?'selected':''}>${v}</option>`).join('');
+    $('#'+p+'Month').innerHTML=MONTHS.map((n,i)=>`<option value="${i+1}" ${i+1===m?'selected':''}>${n}</option>`).join('');
+  });
+}
+const keyOf=p=>`${$('#'+p+'Year').value}-${$('#'+p+'Month').value}`;
+const monthLabel=p=>`${MONTHS[$('#'+p+'Month').value-1]} ${$('#'+p+'Year').value}`;
+const recR=(k,id)=>(DB.records[k]&&DB.records[k][id])||{bags:false,kg:false,kgReceived:0,amtReceived:0};
+function recW(k,id){DB.records[k]=DB.records[k]||{};return DB.records[k][id]=DB.records[k][id]||{bags:false,kg:false,kgReceived:0,amtReceived:0}}
+function statusOf(f,k){
+  const r=recR(k,f.id),b=Math.floor(f.share/BAG),rem=f.share%BAG;
+  if(!r.bags&&!r.kg)return'none';
+  return((b===0||r.bags)&&(rem===0||r.kg))?'full':'partial';
+}
+const ST={full:['مستلم بالكامل','b-full'],partial:['مستلم جزئي','b-partial'],none:['غير مستلم','b-none']};
+function fmtDT(ts){const d=new Date(ts);return d.toLocaleDateString('ar-IQ')+' — '+d.toLocaleTimeString('ar-IQ',{hour:'2-digit',minute:'2-digit'})}
+function saveDistMeta(){
+  const k=keyOf('d');const m=DB.meta[k]=DB.meta[k]||{};
+  m.name=$('#dName').value;if(!m.date)m.date=Date.now();
+  save();showDistInfo();
+}
+function showDistInfo(){
+  const m=DB.meta[keyOf('d')];
+  $('#dInfo').textContent=m&&m.date?`الوقت والتاريخ (محفوظ تلقائياً): ${fmtDT(m.date)}`:`الوقت والتاريخ: ${fmtDT(Date.now())} (يُحفظ تلقائياً عند أول تسجيل)`;
+}
+function memberCard(f,k){
+  const r=recR(k,f.id),b=Math.floor(f.share/BAG),rem=f.share%BAG,st=statusOf(f,k),[stT,stC]=ST[st];
+  return `<div class="card sub"><div class="name">${esc(f.name)}</div>
+  <div class="kv"><span>رقم الصفحة</span><b>${esc(f.page)||'—'}</b></div>
+  ${f.notes?`<div class="kv"><span>الملاحظات</span><b>${esc(f.notes)}</b></div>`:''}
+  <div class="kv"><span>عدد أفراد الأسرة</span><b>${f.members}</b></div>
+  <div class="kv"><span>الحصة الشهرية</span><b>${f.share} كغم = ${detail(f.share)}</b></div>
+  <div class="kv"><span>المبلغ المستحق</span><b>${fmt(f.amount)} د.ع</b></div>
+  <div class="kv"><span>الحالة</span><b><span class="badge ${stC}">${stT}</span></b></div>
+  <label class="chk"><input type="checkbox" id="b_${f.id}" ${r.bags?'checked disabled':''} ${b===0?'disabled':''}><span>استلام الأكياس (${b} كيس)</span></label>
+  <label class="chk"><input type="checkbox" id="k_${f.id}" ${r.kg?'checked disabled':''} ${rem===0?'disabled':''}><span>استلام الكيلوات فوق الكيس (${rem} كغم)</span></label>
+  <div class="kv"><span>المبلغ المستلم فعلياً</span><b>${fmt(r.amtReceived)} د.ع</b></div>
+  <div class="kv"><span>الكمية المستلمة</span><b>${r.kgReceived} كغم</b></div>
+  <div class="kv"><span>الكمية المتبقية عند الموزع</span><b>${Math.max(0,f.share-r.kgReceived)} كغم</b></div>
+  ${st!=='full'?`<button class="full" onclick="deliverOne('${f.id}')">تسليم وتسجيل الاستلام</button>`:'<div class="ok" style="text-align:center;margin-top:10px">✓ تم استلام الحصة بالكامل</div>'}
+  </div>`;
+}
+function renderDist(){
+  const k=keyOf('d');
+  $('#dName').value=(DB.meta[k]&&DB.meta[k].name)||'';showDistInfo();
+  const q=norm($('#distSearch').value);
+  if(!q){$('#distList').innerHTML='<div class="hint">اكتب اسم العائلة للبحث</div>';return}
+  const res=DB.families.filter(f=>norm(f.name+' '+f.page).includes(q));
+  const ids=new Set(res.map(f=>f.id));
+  const roots=res.filter(f=>!(f.parentId&&ids.has(f.parentId)));
+  if(!roots.length){$('#distList').innerHTML='<div class="hint">لا توجد نتائج</div>';return}
+  $('#distList').innerHTML=roots.map(f=>{
+    const kids=f.children.map(fam).filter(Boolean);
+    if(!kids.length)return memberCard(f,k);
+    const all=[f,...kids],tm=all.reduce((a,x)=>a+x.members,0),ts=all.reduce((a,x)=>a+x.share,0),ta=all.reduce((a,x)=>a+x.amount,0),
+    tr=all.reduce((a,x)=>a+recR(k,x.id).kgReceived,0),tam=all.reduce((a,x)=>a+recR(k,x.id).amtReceived,0);
+    return `<div class="group"><div class="name">مجموع العوائل المرتبطة</div>
+    <div class="kv"><span>عدد الأسر</span><b>${all.length}</b></div>
+    <div class="kv"><span>مجموع الأفراد</span><b>${tm}</b></div>
+    <div class="kv"><span>مجموع الحصة</span><b>${ts} كغم = ${detail(ts)}</b></div>
+    <div class="kv"><span>مجموع المبلغ المستحق</span><b>${fmt(ta)} د.ع</b></div>
+    <div class="kv"><span>المستلم</span><b>${tr} كغم — ${fmt(tam)} د.ع</b></div>
+    <div class="kv"><span>المتبقي</span><b>${Math.max(0,ts-tr)} كغم</b></div>
+    ${all.map(x=>memberCard(x,k)).join('')}
+    <div class="row" style="margin-top:12px">
+      <button class="sec" onclick="tickAll('${f.id}')">☑ تحديد الكل</button>
+      <button onclick="deliverGroup('${f.id}')">تسليم وتسجيل الاستلام بشكل مشترك</button>
+    </div>
+    <div class="small" style="margin-top:6px">يمكنك أيضاً تسليم كل عائلة منفصلة بزر التسليم الخاص بها.</div></div>`;
+  }).join('');
+}
+function groupIds(id){const f=fam(id);return[f.id,...f.children.filter(fam)]}
+function tickAll(id){groupIds(id).forEach(i=>['b_','k_'].forEach(p=>{const e=$('#'+p+i);if(e&&!e.disabled)e.checked=true}))}
+function applyDelivery(f,k){
+  const b=Math.floor(f.share/BAG),rem=f.share%BAG,r=recW(k,f.id);
+  const selB=!!($('#b_'+f.id)||{}).checked,selK=!!($('#k_'+f.id)||{}).checked;
+  const addB=b>0&&selB&&!r.bags,addK=rem>0&&selK&&!r.kg;
+  if(!addB&&!addK)return null;
+  const kg=(addB?b*BAG:0)+(addK?rem:0);
+  if(addB)r.bags=true;if(addK)r.kg=true;
+  const done=(b===0||r.bags)&&(rem===0||r.kg);
+  const amt=done?Math.max(0,f.amount-r.amtReceived):Math.round(f.amount*kg/f.share);
+  r.kgReceived+=kg;r.amtReceived+=amt;
+  (r.log=r.log||[]).push({t:Date.now(),kg,amt});
+  return{f,kg,amt};
+}
+function finishDelivery(items){
+  if(!items.length)return toast('حدد ما تريد تسليمه أولاً');
+  const k=keyOf('d');const m=DB.meta[k]=DB.meta[k]||{};
+  if(!m.date)m.date=Date.now();if(!m.name)m.name=$('#dName').value;
+  save();renderDist();toast('تم تسجيل الاستلام ✓');
+  const name=items.map(i=>i.f.name).join(' + '),mem=items.reduce((a,i)=>a+i.f.members,0),kg=items.reduce((a,i)=>a+i.kg,0),amt=items.reduce((a,i)=>a+i.amt,0);
+  sendTelegram(`📦 تم تسجيل تسليم حصة طحين\n\n👤 اسم رب الأسرة: ${name}\n👨‍👩‍👧‍👦 عدد أفراد الأسرة: ${mem} فرد\n🌾 حصة الطحين المستلمة: ${kg} كغم\n💰 المبلغ المستحصل: ${fmt(amt)} د.ع\n📅 الشهر والسنة: ${monthLabel('d')}\n🕒 تاريخ ووقت التسليم: ${fmtDT(Date.now())}`);
+  syncSheets(false);
+}
+function deliverOne(id){const it=applyDelivery(fam(id),keyOf('d'));finishDelivery(it?[it]:[])}
+function deliverGroup(id){const k=keyOf('d');finishDelivery(groupIds(id).map(i=>applyDelivery(fam(i),k)).filter(Boolean))}
+
+/* Telegram */
+async function sendTelegram(text,quiet){
+  if(!S.tgToken||!S.tgChat){if(!quiet)toast('إشعار Telegram غير مفعّل: أضف الرمز والمعرّف من الإعدادات');return false}
+  try{
+    const r=await fetch(`https://api.telegram.org/bot${S.tgToken}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:S.tgChat,text})});
+    const j=await r.json();if(!j.ok)throw new Error(j.description);return true;
+  }catch(e){toast('تعذّر إرسال إشعار Telegram');return false}
+}
+
+/* 4: الإحصائيات */
+function statNames(k){
+  const o={all:[],full:[],partial:[],none:[]};
+  DB.families.forEach(f=>{o.all.push(f.name);o[statusOf(f,k)].push(f.name)});
+  return o;
+}
+function renderStats(){
+  const k=keyOf('s');let bags=0,kgs=0,amt=0,full=0;
+  DB.families.forEach(f=>{const r=recR(k,f.id);if(r.bags)bags+=Math.floor(f.share/BAG);if(r.kg)kgs+=f.share%BAG;amt+=r.amtReceived;if(statusOf(f,k)==='full')full++});
+  $('#statCards').innerHTML=`<div class="kv"><span>إجمالي الأسر بالكامل</span><b class="num">${DB.families.length}</b></div>
+  <div class="kv"><span>إجمالي المبلغ المستحصل</span><b class="num">${fmt(amt)} <small>د.ع</small></b></div>
+  <div class="kv"><span>الأكياس الموزعة</span><b>${bags} كيس${kgs?` و ${kgs} كغم`:''}</b></div>
+  <div class="kv"><span>المستلمون بالكامل</span><b class="num">${full}</b></div>`;
+  window._names=statNames(k);
+  $('#statLists').innerHTML=Object.keys(LT).map(x=>`<details><summary>${LT[x]} (${_names[x].length})</summary>
+    <input type="search" placeholder="بحث سريع..." oninput="filterStat('${x}',this.value)"><ol id="ol_${x}"></ol></details>`).join('');
+  Object.keys(LT).forEach(x=>filterStat(x,''));
+}
+function filterStat(x,q){
+  q=norm(q);
+  $('#ol_'+x).innerHTML=_names[x].map((n,i)=>[i+1,n]).filter(a=>!q||norm(a[1]).includes(q)).map(a=>`<li value="${a[0]}">${esc(a[1])}</li>`).join('')||'<li>لا نتائج</li>';
+}
+
+/* تصدير الملفات */
+const isNative=()=>!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+function blobB64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(b)})}
+async function nativeSave(blob,name,share){
+  const P=Capacitor.Plugins,data=await blobB64(blob);
+  if(!share){
+    try{await P.Filesystem.writeFile({path:'FlourApp/'+name,data,directory:'DOCUMENTS',recursive:true});toast('تم الحفظ في: المستندات/FlourApp');return}catch(e){}
+  }
+  const r=await P.Filesystem.writeFile({path:name,data,directory:'CACHE'});
+  await P.Share.share({title:name,files:[r.uri],dialogTitle:'حفظ أو مشاركة الملف'});
+}
+function dl(blob,name,share){
+  if(isNative()){nativeSave(blob,name,share).catch(e=>{if(!/cancel/i.test(String((e&&e.message)||e)))toast('تعذّر حفظ الملف')});return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+const crcT=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){let c=-1;for(let i=0;i<b.length;i++)c=crcT[(c^b[i])&255]^(c>>>8);return(c^-1)>>>0}
+function zip(files,mime){
+  const enc=new TextEncoder(),ch=[],cd=[];let off=0;
+  files.forEach(f=>{
+    const nm=enc.encode(f.name),d=enc.encode(f.data),crc=crc32(d);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint16(12,33,true);h.setUint32(14,crc,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nm.length,true);
+    ch.push(new Uint8Array(h.buffer),nm,d);
+    const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x0800,true);c.setUint16(14,33,true);c.setUint32(16,crc,true);c.setUint32(20,d.length,true);c.setUint32(24,d.length,true);c.setUint16(28,nm.length,true);c.setUint32(42,off,true);
+    cd.push(new Uint8Array(c.buffer),nm);off+=30+nm.length+d.length;
+  });
+  const cs=cd.reduce((a,b)=>a+b.length,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...ch,...cd,new Uint8Array(e.buffer)],{type:mime});
+}
+const X=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const B={
+  txt:(t,n)=>new Blob(['\uFEFF'+t+'\r\n\r\n'+n.map((x,i)=>`${i+1}- ${x}`).join('\r\n')],{type:'text/plain;charset=utf-8'}),
+  html:(t,n)=>new Blob([htmlDoc(t,n)],{type:'text/html;charset=utf-8'}),
+  docx:(t,n)=>{
+    const p=(s,b,sz)=>`<w:p><w:pPr><w:bidi/>${b?'<w:jc w:val="center"/>':''}</w:pPr><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>${b?'<w:b/><w:bCs/>':''}<w:rtl/><w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr><w:t xml:space="preserve">${X(s)}</w:t></w:r></w:p>`;
+    const body=p(t,1,36)+n.map((x,i)=>p(`${i+1}- ${x}`,0,28)).join('');
+    return zip([
+      {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'},
+      {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'},
+      {name:'word/document.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134"/><w:bidi/></w:sectPr></w:body></w:document>`}
+    ],'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  },
+  xlsx:(t,n)=>{
+    const rows=[`<row r="1"><c r="A1" t="inlineStr"><is><t>#</t></is></c><c r="B1" t="inlineStr"><is><t>${X(t)}</t></is></c></row>`].concat(n.map((x,i)=>`<row r="${i+2}"><c r="A${i+2}"><v>${i+1}</v></c><c r="B${i+2}" t="inlineStr"><is><t>${X(x)}</t></is></c></row>`));
+    return zip([
+      {name:'[Content_Types].xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'},
+      {name:'_rels/.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+      {name:'xl/workbook.xml',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets><sheet name="القائمة" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+      {name:'xl/_rels/workbook.xml.rels',data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'},
+      {name:'xl/worksheets/sheet1.xml',data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView rightToLeft="1" workbookViewId="0"/></sheetViews><cols><col min="1" max="1" width="8" customWidth="1"/><col min="2" max="2" width="45" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData></worksheet>`}
+    ],'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  },
+  pdf:(t,n)=>{
+    const W=1240,H=1754,rowH=64,top=230,per=Math.floor((H-top-120)/rowH),pages=Math.max(1,Math.ceil(n.length/per)),imgs=[];
+    for(let p=0;p<pages;p++){
+      const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+      g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#111';g.direction='rtl';
+      g.textAlign='center';g.font='bold 46px Tahoma,Arial,sans-serif';g.fillText(t,W/2,120);
+      g.strokeStyle='#999';g.beginPath();g.moveTo(100,160);g.lineTo(W-100,160);g.stroke();
+      g.textAlign='right';g.font='34px Tahoma,Arial,sans-serif';
+      n.slice(p*per,(p+1)*per).forEach((x,i)=>{const y=top+i*rowH;g.fillText((p*per+i+1)+'-',W-100,y);g.fillText(x,W-190,y)});
+      g.textAlign='center';g.font='24px Tahoma,Arial';g.fillText(`${p+1} / ${pages}`,W/2,H-60);
+      const b=atob(c.toDataURL('image/jpeg',.9).split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+      imgs.push(u);
+    }
+    const enc=new TextEncoder(),parts=[],off=[];let len=0;
+    const push=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length};
+    const obj=(id,f)=>{off[id]=len;push(id+' 0 obj\n');f();push('\nendobj\n')};
+    push('%PDF-1.4\n');
+    obj(1,()=>push('<< /Type /Catalog /Pages 2 0 R >>'));
+    obj(2,()=>push(`<< /Type /Pages /Kids [${imgs.map((_,i)=>(3+3*i)+' 0 R').join(' ')}] /Count ${pages} >>`));
+    imgs.forEach((u,i)=>{
+      const pg=3+3*i,ct=pg+1,im=pg+2,cs='q 595 0 0 842 0 0 cm /Im0 Do Q';
+      obj(pg,()=>push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /XObject << /Im0 ${im} 0 R >> >> /Contents ${ct} 0 R >>`));
+      obj(ct,()=>push(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`));
+      obj(im,()=>{push(`<< /Type /XObject /Subtype /Image /Width ${W} /Height ${H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${u.length} >>\nstream\n`);push(u);push('\nendstream')});
+    });
+    const total=2+3*pages,xr=len;
+    push(`xref\n0 ${total+1}\n0000000000 65535 f \n`);
+    for(let i=1;i<=total;i++)push(String(off[i]).padStart(10,'0')+' 00000 n \n');
+    push(`trailer\n<< /Size ${total+1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`);
+    return new Blob(parts,{type:'application/pdf'});
+  }
+};
+function htmlDoc(t,n){return `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${X(t)}</title><style>body{font-family:Tahoma,Arial,sans-serif;padding:20px}table{border-collapse:collapse;width:100%}th,td{border:1px solid #999;padding:8px;text-align:right}th{background:#e8f5ee}</style></head><body><h2 style="text-align:center">${X(t)}</h2><table><tr><th style="width:60px">#</th><th>اسم رب الأسرة</th></tr>${n.map((x,i)=>`<tr><td>${i+1}</td><td>${X(x)}</td></tr>`).join('')}</table></body></html>`}
+async function exportFile(action){
+  const f=$('#expFmt').value,l=$('#expList').value,names=(window._names||statNames(keyOf('s')))[l];
+  if(!names.length)return toast('القائمة فارغة');
+  const title=`${LT[l]} — ${monthLabel('s')}`,file=`${LT[l]}-${keyOf('s')}.${f}`;
+  if(action==='print'){if(isNative()){dl(B.html(title,names),file.replace(/\.[^.]+$/,'.html'),true);return}
+    const fr=document.createElement('iframe');fr.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(fr);
+    fr.onload=()=>{fr.contentWindow.focus();fr.contentWindow.print();setTimeout(()=>fr.remove(),3000)};fr.srcdoc=htmlDoc(title,names);return;
+  }
+  const blob=B[f](title,names);
+  if(action==='share'){if(isNative()){dl(blob,file,true);return}
+    try{const fl=new File([blob],file,{type:blob.type});
+      if(navigator.canShare&&navigator.canShare({files:[fl]})){await navigator.share({files:[fl],title});return}
+    }catch(e){if(e.name==='AbortError')return}
+    toast('المشاركة غير مدعومة هنا — جارٍ التنزيل');
+  }
+  dl(blob,file);
+}
+
+/* 5: الإعدادات */
+function loadSettingsUI(){$('#sheetUrl').value=S.sheetUrl||'';$('#tgToken').value=S.tgToken||'';$('#tgChat').value=S.tgChat||'';checkSheet()}
+function backupFull(){dl(new Blob([JSON.stringify({type:'full',...DB},null,1)],{type:'application/json'}),`نسخة-كاملة-${new Date().toISOString().slice(0,10)}.json`)}
+function restoreFull(inp){readJson(inp,d=>{
+  if(!Array.isArray(d.families))return toast('الملف غير صالح');
+  window._pendFull=d;
+  openModal(`<h3>استعادة النسخة الكاملة</h3><p>سيتم استبدال كل البيانات الحالية. متابعة؟</p><div class="row"><button onclick="applyFull()">نعم</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
+})}
+function applyFull(){const d=window._pendFull;DB={families:d.families,records:d.records||{},meta:d.meta||{}};save();closeModal();toast('تمت استعادة النسخة ✓')}
+function saveSheetUrl(){S.sheetUrl=$('#sheetUrl').value.trim();saveS();checkSheet();toast('تم حفظ الرابط')}
+async function checkSheet(){
+  const el=$('#sheetStatus');el.textContent='جارٍ الفحص...';el.className='';
+  try{
+    if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(S.sheetUrl))throw 0;
+    const r=await fetch(S.sheetUrl+'?action=ping');const j=await r.json();if(!j.ok)throw 0;
+    el.textContent='جاهز ✓';el.className='ok';
+  }catch(e){el.textContent='غير جاهز ✗';el.className='no'}
+}
+async function syncSheets(manual){
+  if(!S.sheetUrl){if(manual)toast('أدخل رابط Google Sheets أولاً');return}
+  try{
+    await fetch(S.sheetUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'sync',data:DB})});
+    if(manual)toast('تم إرسال البيانات إلى Google Sheets ✓');
+  }catch(e){if(manual)toast('تعذّرت المزامنة — تأكد من الاتصال بالإنترنت')}
+}
+async function restoreSheets(){
+  try{
+    const r=await fetch(S.sheetUrl+'?action=get');const d=await r.json();
+    if(!d||!Array.isArray(d.families))throw 0;
+    window._pendFull=d;
+    openModal(`<h3>استعادة من Google Sheets</h3><p>تم العثور على ${d.families.length} عائلة. سيتم استبدال البيانات الحالية. متابعة؟</p><div class="row"><button onclick="applyFull()">نعم</button><button class="sec" onclick="closeModal()">إلغاء</button></div>`);
+  }catch(e){toast('تعذّرت الاستعادة — لا توجد بيانات أو الرابط غير جاهز')}
+}
+function saveTelegram(){S.tgToken=$('#tgToken').value.trim();S.tgChat=$('#tgChat').value.trim();saveS();toast('تم حفظ إعدادات Telegram على هذا الجهاز ✓')}
+async function testTelegram(){saveTelegram();if(await sendTelegram('✅ رسالة تجريبية من تطبيق توزيع الطحين'))toast('تم إرسال الرسالة التجريبية ✓')}
+
+
+/* زر الرجوع في الأندرويد */
+if(isNative()&&Capacitor.Plugins.App){
+  Capacitor.Plugins.App.addListener('backButton',()=>{
+    if($('#modal').classList.contains('show'))return closeModal();
+    const cur=document.querySelector('.page.active').id.slice(2);
+    if(cur!=='home')showPage('home');else Capacitor.Plugins.App.exitApp();
+  });
+}
+fillSelects();showPage('home');
+</script>
+</body>
+</html>
