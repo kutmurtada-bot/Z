@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test.beforeEach(async ({ page }) => {
   await page.route('https://browser.sentry-cdn.com/**', route => route.abort());
+  await page.route('https://script.google.com/macros/s/**', route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
   await page.route('https://fonts.googleapis.com/**', route => route.abort());
   await page.route('https://fonts.gstatic.com/**', route => route.abort());
   await page.goto('/');
