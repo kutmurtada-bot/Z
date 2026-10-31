@@ -167,11 +167,30 @@ test('Sentry SDK initializes and receives handled app errors when the CDN is ava
   await expect.poll(() => page.evaluate(() => window.__flourSentryReady)).toBe(true);
   await page.evaluate(() => window.__flourReportError(new Error('QA synthetic exception'), 'qa-test'));
   await expect.poll(() => page.evaluate(() => window.__sentryCaptured)).toBe('QA synthetic exception');
-  const options = await page.evaluate(() => ({
-    pii: window.__sentryOptions.sendDefaultPii,
-    environment: window.__sentryOptions.environment,
-    beforeSend: typeof window.__sentryOptions.beforeSend
-  }));
-  expect(options.pii).toBe(false);
-  expect(options.beforeSend).toBe('function');
+  const result = await page.evaluate(() => {
+    const event = {
+      user: { id: 'must-not-leave-device' },
+      extra: { privateValue: 'must-not-leave-device' },
+      request: { data: 'private', cookies: 'private', headers: { secret: 'private' }, query_string: 'private', url: 'https://example.test/path?name=private' },
+      breadcrumbs: [{ data: { body: 'private', query: 'private', response: 'private', cookies: 'private', url: 'https://example.test/?name=private' } }]
+    };
+    const clean = window.__sentryOptions.beforeSend(event);
+    return {
+      pii: window.__sentryOptions.sendDefaultPii,
+      environment: window.__sentryOptions.environment,
+      beforeSend: typeof window.__sentryOptions.beforeSend,
+      userRemoved: clean.user === undefined,
+      extraEmpty: Object.keys(clean.extra).length === 0,
+      requestDataRemoved: !('data' in clean.request) && !('cookies' in clean.request) && !('headers' in clean.request) && !('query_string' in clean.request),
+      requestUrlClean: clean.request.url === 'https://example.test/path',
+      breadcrumbClean: !('body' in clean.breadcrumbs[0].data) && !('query' in clean.breadcrumbs[0].data) && !('response' in clean.breadcrumbs[0].data) && !('cookies' in clean.breadcrumbs[0].data) && clean.breadcrumbs[0].data.url === 'https://example.test/'
+    };
+  });
+  expect(result.pii).toBe(false);
+  expect(result.beforeSend).toBe('function');
+  expect(result.userRemoved).toBe(true);
+  expect(result.extraEmpty).toBe(true);
+  expect(result.requestDataRemoved).toBe(true);
+  expect(result.requestUrlClean).toBe(true);
+  expect(result.breadcrumbClean).toBe(true);
 });
