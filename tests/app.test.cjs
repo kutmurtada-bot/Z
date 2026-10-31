@@ -46,3 +46,20 @@ test('Sentry is configured without default personal-data collection', () => {
   assert.match(html, /beforeSend\s*:/);
   assert.match(html, /delete event\.request\.data/);
 });
+
+test('Sentry loader buffers startup errors and reports handled failures', () => {
+  assert.match(html, /browser\.sentry-cdn\.com\/8\.47\.0\/bundle\.min\.js/);
+  assert.match(html, /window\.addEventListener\('error',earlyError\)/);
+  assert.match(html, /window\.addEventListener\('unhandledrejection',earlyRejection\)/);
+  assert.match(html, /window\.__flourReportError=function/);
+  assert.match(html, /window\.Sentry\.captureException\(err\)/);
+  assert.match(html, /window\.removeEventListener\('error',earlyError\)/);
+  assert.match(html, /sendDefaultPii:false/);
+  assert.match(html, /delete event\.request\.data/);
+  assert.match(html, /delete event\.request\.cookies/);
+});
+
+test('Google Sheets sync does not claim verified success for an opaque no-cors request', () => {
+  assert.match(html, /أُرسل طلب المزامنة؛ لكن لا يمكن تأكيد حفظه من التطبيق/);
+  assert.match(html, /__flourReportError\(e,'google-sheets-sync'\)/);
+});
