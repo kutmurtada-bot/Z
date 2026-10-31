@@ -71,3 +71,10 @@ test('editing family member count recalculates the fixed quota and payment', () 
 test('native Android is tagged as production in Sentry', () => {
   assert.match(html, /window\.Capacitor&&window\.Capacitor\.isNativePlatform&&window\.Capacitor\.isNativePlatform\(\)/);
 });
+
+test('monthly delivery records retain their quota, payment and member-count snapshot', () => {
+  assert.match(html, /quotaKg:r\.quotaKg\?\?f\.share/);
+  assert.match(html, /amountDue:r\.amountDue\?\?f\.amount/);
+  assert.match(html, /membersCount:r\.membersCount\?\?f\.members/);
+  assert.match(html, /if\(r\.quotaKg==null\)\{r\.quotaKg=f\.share;r\.amountDue=f\.amount;r\.membersCount=f\.members;\}/);
+});
